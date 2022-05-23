@@ -1,0 +1,44 @@
+package ${package.ServiceImpl};
+import lombok.extern.slf4j.Slf4j;
+import ${package.Entity}.${entity};
+import ${package.Mapper}.${table.mapperName};
+import ${package.Service}.${table.serviceName};
+import ${superServiceImplClassPackage};
+import org.springframework.stereotype.Service;
+import ${cfg.dtoPackage}.${entity}Dto;
+import ${cfg.reqPackage}.${entity}QueryReq;
+import ${cfg.respPackage}.${entity}ListResp;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import ${cfg.utilPackage}.DozerUtil;
+import java.util.List;
+/**
+ * <p>
+ * $!{table.comment} 服务实现类
+ * </p>
+ *
+ * @author ${author}
+ * @since 2022-04-10
+ */
+@Slf4j
+@Service
+#if(${kotlin})
+open class ${table.serviceImplName} : ${superServiceImplClass}<${table.mapperName}, ${entity}>(), ${table.serviceName} {
+
+}
+#else
+public class ${table.serviceImplName} extends ${superServiceImplClass}<${table.mapperName}, ${entity}> implements ${table.serviceName} {
+    @Override
+    public List<${entity}> selectList(${entity}Dto dto) {
+        return baseMapper.selectList(dto);
+    }
+
+    @Override
+    public PageInfo<${entity}ListResp> page(${entity}QueryReq req){
+        PageHelper.startPage(req.getPageNum(), req.getPageSize());
+        PageInfo pageInfo = new PageInfo(this.selectList(DozerUtil.convert(req, ${entity}Dto.class)));
+        pageInfo.setList(DozerUtil.convert(pageInfo.getList(), ${entity}ListResp.class));
+        return pageInfo;
+    }
+}
+#end

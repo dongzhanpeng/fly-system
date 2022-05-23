@@ -1,0 +1,49 @@
+package $!{cfg.dtoPackage};
+#if(${entityLombokModel})
+import lombok.Data;
+import lombok.experimental.Accessors;
+#end
+#foreach($pkg in ${table.importPackages})
+#if(${pkg.indexOf("baomidou")}==-1)
+import ${pkg};
+#end
+#end
+import java.util.List;
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
+/**
+ * <p>
+ * $!{table.comment}
+ * </p>
+ * @author ${author}
+ * @since 2022-04-10
+ */
+#if(${entityLombokModel})
+@Data
+@Accessors(chain = true)
+#end
+public class ${entity}Dto extends BasePo {
+## ----------  BEGIN 字段循环遍历  ----------
+#foreach($field in ${table.fields})
+## ----------  忽略父类属性 begin  ----------
+#set($hasSuperColumn=false)
+#foreach($superColumn in ${cfg.superColumns})
+#if($superColumn==${field.propertyName})
+#set($hasSuperColumn=true)
+#end
+#end
+## ----------  忽略父类属性 end  ----------
+#if("$!field.comment" != "" && !${hasSuperColumn})
+    /**
+     * ${field.comment}
+     */
+#end
+#if(!${hasSuperColumn})
+    private ${field.propertyType} ${field.propertyName};
+#end
+#end
+#*    /**
+    * 排序参数
+    */
+    private List<OrderItem> orders;*#
+## ----------  END 字段循环遍历  ----------
+}

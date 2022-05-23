@@ -1,0 +1,72 @@
+package $!{cfg.reqPackage};
+#if(${swagger2})
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+#end
+#if(${entityLombokModel})
+import lombok.Data;
+import lombok.experimental.Accessors;
+#end
+#foreach($pkg in ${table.importPackages})
+#if(${pkg.indexOf("baomidou")}==-1 && ${pkg.indexOf("BasePo")}==-1)
+import ${pkg};
+#end
+#end
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+
+/**
+ * <p>
+ * $!{table.comment}
+ * </p>
+ * @author ${author}
+ * @since 2022-04-10
+ */
+#if(${entityLombokModel})
+@Data
+@Accessors(chain = true)
+#end
+#if(${swagger2})
+@ApiModel(value = "$!{table.comment}-${entity}SaveReq对象" , description = "$!{table.comment}")
+#end
+public class ${entity}SaveReq{
+#foreach($field in ${table.commonFields})
+#if($field.keyIdentityFlag)
+    @ApiModelProperty(value = "主键ID")
+    private ${field.propertyType} ${field.propertyName};
+#end
+#end
+## ----------  BEGIN 字段循环遍历  ----------
+#foreach($field in ${table.fields})
+## ----------  忽略父类属性 begin  ----------
+#set($hasSuperColumn=false)
+#foreach($superColumn in ${cfg.superColumns})
+#if($superColumn==${field.propertyName})
+#set($hasSuperColumn=true)
+#end
+#end
+## ----------  忽略父类属性 end  ----------
+#if("$!field.comment" != "" && !${hasSuperColumn} && "$!field.propertyName" !="version")
+#if(${swagger2})
+    /**
+     * ${field.comment}
+     */
+    @ApiModelProperty(value = "${field.comment}")
+#else
+    /**
+     * ${field.comment}
+     */
+#end
+#end
+#if(!${hasSuperColumn} && "$!field.propertyName" !="version")
+#if(!$field.keyIdentityFlag && $field.columnType.type != 'String')
+    @NotNull(message = "${field.comment}不能为null")
+#end
+#if(!$field.keyIdentityFlag && $field.columnType.type == 'String')
+    @NotBlank(message = "${field.comment}不能为空")
+#end
+    private ${field.propertyType} ${field.propertyName};
+#end
+#end
+## ----------  END 字段循环遍历  ----------
+}
