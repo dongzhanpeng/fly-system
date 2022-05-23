@@ -1,0 +1,34 @@
+package ${package.Service};
+import ${package.Entity}.${entity};
+import ${superServiceClassPackage};
+import ${cfg.dtoPackage}.${entity}Dto;
+import ${cfg.reqPackage}.${entity}QueryReq;
+import ${cfg.respPackage}.${entity}ListResp;
+import com.github.pagehelper.PageInfo;
+import java.util.List;
+/**
+ * <p>
+ * $!{table.comment} 服务类
+ * </p>
+ *
+ * @author ${author}
+ * @since 2022-04-10
+ */
+#if(${kotlin})
+interface ${table.serviceName} : ${superServiceClass}<${entity}>
+#else
+public interface ${table.serviceName} extends ${superServiceClass}<${entity}> {
+    /**
+     * dto 查询记录
+     * @param dto
+     * @return
+     */
+    List<${entity}> selectList(${entity}Dto dto);
+    /**
+     * 分页查询记录
+     * @param req
+     * @return
+     */
+    PageInfo<${entity}ListResp> page(${entity}QueryReq req);
+}
+#end
